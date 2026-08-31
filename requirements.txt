@@ -1,0 +1,16 @@
+numpy
+pandas
+scipy
+matplotlib
+scikit-learn
+xgboost
+lightgbm
+catboost
+torch
+torchvision
+shap
+umap-learn
+imbalanced-learn
+tabulate
+kaggle
+pyarrow
