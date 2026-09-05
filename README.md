@@ -198,25 +198,7 @@ See [`requirements.txt`](requirements.txt). Core stack: `xgboost`, `lightgbm`,
 - This is a research/portfolio project, **not a validated clinical tool**, and is
   not intended for direct clinical decision-making.
 
-## 8. Citation
 
-If you build on this work, please cite it as:
+## 8. Author
 
-```bibtex
-@misc{preterm-birth-cdc-natality,
-  title  = {Preterm Birth Prediction: Hybrid Tabular ML + Tabular-to-Image CNN on CDC Natality Data},
-  author = {Quang Nam},
-  year   = {2026},
-  url    = {https://github.com/wgnamlabs/preterm-birth-prediction}
-}
-```
-
-## 9. License
-
-Code released under the [MIT License](LICENSE). The underlying CDC/NCHS Natality
-data is public-use government data distributed via the Kaggle dataset linked above;
-review that dataset's license/terms before redistributing any data files.
-
-## 10. Author
-
-**Quang Nam** — feel free to reach out via [LinkedIn](#) / [email](#).
+**Quang Nam** — [wgnam2k4@email.com](mailto:wgnam2k4@email.com)
