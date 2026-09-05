@@ -34,6 +34,9 @@ scale, and does a tabular-to-image CNN branch add anything on top?*
 | CatBoost | 0.7409 | [0.7374, 0.7443] | 0.3908 | 0.3488 | 0.6129 | 0.7355 |
 | LightGBM | 0.7286 | [0.7257, 0.7322] | 0.3615 | 0.3345 | 0.6211 | 0.7091 |
 
+![ROC curves — full test set](results/preterm_scopus_publication_outputs/roc_curves_full_test.png)
+![Calibration curves — full test set](results/preterm_scopus_publication_outputs/calibration_full_test.png)
+
 ### 2.2 CNN branches (tabular-to-image, 120K-sample test subset — GPU/time-capped)
 
 | Model | Feature map | AUROC | AUPRC | F1 |
@@ -42,21 +45,39 @@ scale, and does a tabular-to-image CNN branch add anything on top?*
 | CNN ResNet18-DeepInsight | 1-channel DeepInsight map | 0.7296 | 0.3745 | 0.3358 |
 | CNN Simple-UMAP | 1-channel UMAP-density map | 0.6383 | 0.2172 | 0.2683 |
 
+![CNN ROC curves — test subset](results/preterm_scopus_publication_outputs/cnn_roc_curves_test_subset.png)
+
 Full per-model metrics (incl. MCC, PPV, NPV, Brier score, confusion-matrix counts)
-are in [`results/metrics/final_metrics_cdc_natality.csv`](results/metrics/final_metrics_cdc_natality.csv).
+are in [`final_scopus_metrics.csv`](results/preterm_scopus_publication_outputs/final_scopus_metrics.csv)
+and the consolidated table in
+[`consolidated_metrics_for_manuscript.csv`](results/preterm_scopus_publication_outputs/extra_publication_assets/consolidated_metrics_for_manuscript.csv).
 
 **Takeaway:** the CNN feature-map branches do not beat well-tuned gradient boosting
 on this tabular problem — expected, since birth-certificate variables are low-
 dimensional/tabular by nature. They are included as an ablation / hybrid-architecture
 comparison, not because they win.
 
-### 2.3 Top predictive features (SHAP, full-test XGBoost)
+### 2.3 Model comparison across all metrics
+
+![AUROC forest plot with 95% CI](results/preterm_scopus_publication_outputs/extra_publication_assets/auroc_forest_plot.png)
+![Radar chart — normalized multi-metric comparison](results/preterm_scopus_publication_outputs/extra_publication_assets/radar_chart_model_comparison.png)
+![Confusion matrices at optimal threshold](results/preterm_scopus_publication_outputs/extra_publication_assets/confusion_matrices_grid.png)
+
+### 2.4 Top predictive features (SHAP, full-test XGBoost)
 
 Plurality (multiple birth) is the dominant driver, followed by gestational
 hypertension, third-trimester smoking, pre-existing hypertension, and number of
 prenatal visits.
 
-### 2.4 Comparison with prior work on the same data source
+![SHAP summary — XGBoost](results/preterm_scopus_publication_outputs/xgboost_shap_summary.png)
+![SHAP top-20 feature importance](results/preterm_scopus_publication_outputs/extra_publication_assets/shap_bar_top20.png)
+
+### 2.5 Clinical utility & calibration
+
+![Decision curve analysis](results/preterm_scopus_publication_outputs/decision_curve_analysis.png)
+![Predicted probability distribution by true class](results/preterm_scopus_publication_outputs/extra_publication_assets/predicted_probability_distribution.png)
+
+### 2.6 Comparison with prior work on the same data source
 
 | Study | Data | Best model | AUROC (preterm) |
 |---|---|---|---|
@@ -68,8 +89,11 @@ prenatal visits.
 > studies use different cohorts, years, and preprocessing. Treat this table as
 > context, not proof of superiority.
 
-*(See `results/figures/` once populated — ROC/PR curves, calibration, forest plot,
-SHAP summary, decision curve analysis, confusion matrices, radar chart.)*
+More figures (SHAP dependence plots, feature correlation heatmap, sensitivity/
+specificity vs. threshold, Table 1 baseline characteristics) are in
+[`results/preterm_scopus_publication_outputs/extra_publication_assets/`](results/preterm_scopus_publication_outputs/extra_publication_assets/),
+and a full auto-generated write-up is in
+[`paper_summary_report_scopus.md`](results/preterm_scopus_publication_outputs/paper_summary_report_scopus.md).
 
 ---
 
@@ -77,20 +101,18 @@ SHAP summary, decision curve analysis, confusion matrices, radar chart.)*
 
 ```
 .
-├── notebooks/                              # Runnable Jupyter notebooks (Kaggle-ready)
-│   ├── part_a_main_pipeline.ipynb          # Data → preprocessing → ML + CNN training → metrics
-│   ├── part_b_extra_publication_assets.ipynb  # Table 1, forest plot, SHAP, DCA, calibration table
-│   └── part_c_display_export.ipynb         # Inline figure gallery + transformed dataset export
-├── src/                                    # Same code as .py scripts, for readability / diffing
-│   ├── part_a_main_pipeline.py
-│   ├── part_b_extra_publication_assets.py
-│   └── part_c_display_export.py
+├── notebooks/                                   # Runnable Jupyter notebooks (Kaggle-ready, full output committed)
+│   ├── part_a_main_pipeline.ipynb               # Data → preprocessing → ML + CNN training → metrics
+│   ├── part_b_extra_publication_assets.ipynb    # Table 1, forest plot, SHAP, DCA, calibration table
+│   └── part_c_display_export.ipynb              # Inline figure gallery + transformed dataset export
 ├── results/
-│   ├── metrics/
-│   │   └── final_metrics_cdc_natality.csv  # Real metrics from the run reported above
-│   └── figures/                            # Drop your generated PNGs here (see figures/README.md)
+│   └── preterm_scopus_publication_outputs/      # Real artifacts from the Kaggle run reported above
+│       ├── final_scopus_metrics.csv
+│       ├── paper_summary_report_scopus.md
+│       ├── roc_curves_full_test.png, calibration_full_test.png, decision_curve_analysis.png, ...
+│       └── extra_publication_assets/            # Table 1, forest plot, SHAP dependence plots, radar chart, ...
 ├── docs/
-│   └── methodology.md                      # Pipeline details, leakage handling, evaluation design
+│   └── methodology.md                           # Pipeline details, leakage handling, evaluation design
 ├── requirements.txt
 ├── LICENSE
 └── README.md
@@ -100,7 +122,9 @@ SHAP summary, decision curve analysis, confusion matrices, radar chart.)*
 kernel/session** (B and C reuse variables — model objects, `X_train`/`X_test`,
 `OUT_DIR` — created by A). They were split from a single working notebook so each
 stage is independently readable; see [`docs/methodology.md`](docs/methodology.md)
-for exactly what each stage does.
+for exactly what each stage does. All three notebooks in this repo are committed
+**with their real output already embedded** (including all inline figures in
+Part C) — you can read the results directly on GitHub without re-running anything.
 
 ---
 
@@ -112,8 +136,8 @@ for exactly what each stage does.
    Preterm prevalence ≈ 12.2%.
 3. **Leakage removal**: all variables that are only known *after* delivery
    (birth weight, APGAR, NICU admission, delivery method, gestational-age-derived
-   fields, etc. — 19 columns) are dropped before modeling. See
-   `LEAKAGE_COLS` in `src/part_a_main_pipeline.py`.
+   fields, etc. — 19 columns) are dropped before modeling. See the leakage-removal
+   cell in [`notebooks/part_a_main_pipeline.ipynb`](notebooks/part_a_main_pipeline.ipynb).
 4. **Split**: stratified 70% train / 15% val / 15% test, fixed seed (42).
 5. **Tabular models**: XGBoost, LightGBM, CatBoost (class-weighted for the 12%
    positive rate), stacked via a logistic-regression meta-learner trained on
@@ -134,9 +158,10 @@ This pipeline is written for **Kaggle Notebooks with a T4 GPU** (it auto-downloa
 the dataset via the Kaggle API and expects `/kaggle/working` paths, falling back to
 `./` locally). To reproduce:
 
-1. Open `notebooks/part_a_main_pipeline.ipynb` on Kaggle (GPU T4 accelerator,
-   Internet **on**), or run `src/part_a_main_pipeline.py` locally with a Kaggle API
-   token configured (`~/.kaggle/kaggle.json`) and a CUDA GPU.
+1. Open [`notebooks/part_a_main_pipeline.ipynb`](notebooks/part_a_main_pipeline.ipynb)
+   on Kaggle (GPU T4 accelerator, Internet **on**), or download it and run it locally
+   in Jupyter Lab with a Kaggle API token configured (`~/.kaggle/kaggle.json`) and a
+   CUDA GPU.
 2. Run it top to bottom — it installs missing packages, downloads the dataset,
    trains all 7 models, and saves metrics/figures to `OUT_DIR`.
 3. In the **same session**, run `part_b_extra_publication_assets` for the extra
@@ -180,9 +205,9 @@ If you build on this work, please cite it as:
 ```bibtex
 @misc{preterm-birth-cdc-natality,
   title  = {Preterm Birth Prediction: Hybrid Tabular ML + Tabular-to-Image CNN on CDC Natality Data},
-  author = {<Your Name>},
+  author = {Quang Nam},
   year   = {2026},
-  url    = {https://github.com/<your-username>/<repo-name>}
+  url    = {https://github.com/wgnamlabs/preterm-birth-prediction}
 }
 ```
 
@@ -194,4 +219,4 @@ review that dataset's license/terms before redistributing any data files.
 
 ## 10. Author
 
-**<Your Name>** — feel free to reach out via [LinkedIn](#) / [email](#).
+**Quang Nam** — feel free to reach out via [LinkedIn](#) / [email](#).

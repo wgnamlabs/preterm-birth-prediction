@@ -135,7 +135,8 @@ Additional publication-style assets (Part B):
 
 - Global seed `SEED = 42` for `random`, `numpy`, `torch` (+ CUDA).
 - All Kaggle-dataset downloads, model configs, and output paths are controlled by
-  the config block at the top of `src/part_a_main_pipeline.py`
+  the config block at the top of
+  [`notebooks/part_a_main_pipeline.ipynb`](../notebooks/part_a_main_pipeline.ipynb)
   (`RUN_CNN`, `RUN_SHAP`, `RUN_SUBGROUP`, `RUN_DCA`, `CNN_*_MAX`,
   `BOOTSTRAP_CI_*`, `SHAP_SAMPLE_N`, etc.) — flip these to reproduce faster/slower
   or full-scale runs.

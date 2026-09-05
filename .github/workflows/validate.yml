@@ -31,8 +31,3 @@ jobs:
               nbformat.validate(nb)
               print(f"OK: {path}")
           EOF
-
-      - name: Byte-compile source scripts
-        run: |
-          python -m py_compile src/*.py
-          echo "All src/*.py files compile."
