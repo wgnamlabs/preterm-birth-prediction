@@ -6,7 +6,6 @@ combines gradient-boosted tabular models with CNNs trained on tabular-to-image
 feature maps, evaluated on a fully independent 1.63M-sample test set.
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)]()
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Notebook](https://img.shields.io/badge/run%20on-Kaggle%20GPU%20T4-20BEFF)]()
 
 > **Best model:** ML Stacked Ensemble (XGBoost + LightGBM + CatBoost, meta-learner
@@ -35,7 +34,6 @@ scale, and does a tabular-to-image CNN branch add anything on top?*
 | LightGBM | 0.7286 | [0.7257, 0.7322] | 0.3615 | 0.3345 | 0.6211 | 0.7091 |
 
 ![ROC curves — full test set](results/preterm_scopus_publication_outputs/roc_curves_full_test.png)
-![Calibration curves — full test set](results/preterm_scopus_publication_outputs/calibration_full_test.png)
 
 ### 2.2 CNN branches (tabular-to-image, 120K-sample test subset — GPU/time-capped)
 
@@ -44,8 +42,6 @@ scale, and does a tabular-to-image CNN branch add anything on top?*
 | CNN EfficientNetB0-Fingerprint | 3-channel fingerprint map | 0.7307 | 0.3756 | 0.3341 |
 | CNN ResNet18-DeepInsight | 1-channel DeepInsight map | 0.7296 | 0.3745 | 0.3358 |
 | CNN Simple-UMAP | 1-channel UMAP-density map | 0.6383 | 0.2172 | 0.2683 |
-
-![CNN ROC curves — test subset](results/preterm_scopus_publication_outputs/cnn_roc_curves_test_subset.png)
 
 Full per-model metrics (incl. MCC, PPV, NPV, Brier score, confusion-matrix counts)
 are in [`final_scopus_metrics.csv`](results/preterm_scopus_publication_outputs/final_scopus_metrics.csv)
@@ -60,22 +56,17 @@ comparison, not because they win.
 ### 2.3 Model comparison across all metrics
 
 ![AUROC forest plot with 95% CI](results/preterm_scopus_publication_outputs/extra_publication_assets/auroc_forest_plot.png)
-![Radar chart — normalized multi-metric comparison](results/preterm_scopus_publication_outputs/extra_publication_assets/radar_chart_model_comparison.png)
-![Confusion matrices at optimal threshold](results/preterm_scopus_publication_outputs/extra_publication_assets/confusion_matrices_grid.png)
 
 ### 2.4 Top predictive features (SHAP, full-test XGBoost)
 
-Plurality (multiple birth) is the dominant driver, followed by gestational
-hypertension, third-trimester smoking, pre-existing hypertension, and number of
-prenatal visits.
+Number of prenatal visits and plurality (multiple birth) are the top two drivers,
+followed by gestational hypertension, mother's age, and third-trimester smoking.
 
 ![SHAP summary — XGBoost](results/preterm_scopus_publication_outputs/xgboost_shap_summary.png)
-![SHAP top-20 feature importance](results/preterm_scopus_publication_outputs/extra_publication_assets/shap_bar_top20.png)
 
-### 2.5 Clinical utility & calibration
+### 2.5 Clinical utility
 
 ![Decision curve analysis](results/preterm_scopus_publication_outputs/decision_curve_analysis.png)
-![Predicted probability distribution by true class](results/preterm_scopus_publication_outputs/extra_publication_assets/predicted_probability_distribution.png)
 
 ### 2.6 Comparison with prior work on the same data source
 
@@ -89,9 +80,11 @@ prenatal visits.
 > studies use different cohorts, years, and preprocessing. Treat this table as
 > context, not proof of superiority.
 
-More figures (SHAP dependence plots, feature correlation heatmap, sensitivity/
-specificity vs. threshold, Table 1 baseline characteristics) are in
-[`results/preterm_scopus_publication_outputs/extra_publication_assets/`](results/preterm_scopus_publication_outputs/extra_publication_assets/),
+More figures (calibration curves, CNN ROC curves, radar chart, confusion matrices,
+SHAP dependence plots, feature correlation heatmap, sensitivity/specificity vs.
+threshold, predicted probability distribution, Table 1 baseline characteristics) are
+in [`results/preterm_scopus_publication_outputs/`](results/preterm_scopus_publication_outputs/)
+and [`.../extra_publication_assets/`](results/preterm_scopus_publication_outputs/extra_publication_assets/),
 and a full auto-generated write-up is in
 [`paper_summary_report_scopus.md`](results/preterm_scopus_publication_outputs/paper_summary_report_scopus.md).
 
@@ -112,7 +105,7 @@ and a full auto-generated write-up is in
 │       ├── roc_curves_full_test.png, calibration_full_test.png, decision_curve_analysis.png, ...
 │       └── extra_publication_assets/            # Table 1, forest plot, SHAP dependence plots, radar chart, ...
 ├── docs/
-│   └── methodology.md                           # Pipeline details, leakage handling, evaluation design
+│   ├── methodology.md                           # Pipeline details (English)
 ├── requirements.txt
 ├── LICENSE
 └── README.md
@@ -150,7 +143,7 @@ Part C) — you can read the results directly on GitHub without re-running anyth
    Hosmer-Lemeshow, decision curve analysis, SHAP, and subgroup AUROC
    (by smoking status, BMI, plurality).
 
-Full detail: [`docs/methodology.md`](docs/methodology.md).
+Full detail: [`docs/methodology.md`](docs/methodology.md) (English) 
 
 ## 5. How to Run
 
@@ -197,8 +190,8 @@ See [`requirements.txt`](requirements.txt). Core stack: `xgboost`, `lightgbm`,
   sample-for-sample to the tabular models' full-test numbers.
 - This is a research/portfolio project, **not a validated clinical tool**, and is
   not intended for direct clinical decision-making.
+- Data-derived artifacts in `results/` are aggregate metrics and figures only, not
+  raw data. The underlying CDC/NCHS Natality data is public-use but distributed via
+  a third-party Kaggle dataset — review its terms before redistributing raw files.
 
 
-## 8. Author
-
-**Quang Nam** — [wgnam2k4@email.com](mailto:wgnam2k4@email.com)
